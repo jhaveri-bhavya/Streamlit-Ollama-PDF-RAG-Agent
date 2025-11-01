@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Service 1: Your Streamlit App
+  app:
+    build: .  # Tells Docker to build the Dockerfile in this folder
+    container_name: rag_app
+    ports:
+      - "8501:8501" # Maps your computer's port 8501 to the container's port
+    depends_on:
+      - ollama        # Waits for the 'ollama' service to start
+    networks:
+      - rag_net
+
+  # Service 2: The Ollama Server
+  ollama:
+    image: ollama/ollama # Uses the official Ollama image
+    container_name: ollama_server
+    ports:
+      - "11434:11434" # Maps your computer's port to the container's port
+    volumes:
+      - ollama_data:/root/.ollama # Saves downloaded models to your computer
+    networks:
+      - rag_net
+
+# This is the private network they will use to talk
+networks:
+  rag_net:
+    driver: bridge
+
+# This creates a persistent "volume" on your computer to store the models
+volumes:
+  ollama_data:
